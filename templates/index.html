@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XML Task Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="card">
+        <header class="card-header">
+            <h1><i class="fa-solid fa-cogs"></i> XML Task Generator</h1>
+            <p>A simple tool to generate mock task files.</p>
+        </header>
+
+        <main class="card-body">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <i class="fa-solid {% if category == 'success' %}fa-check-circle{% else %}fa-exclamation-triangle{% endif %}"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form id="generator-form" method="POST">
+                <div class="form-group">
+                    <label>1. Select Environment</label>
+                    <div class="radio-group-modern">
+                        <input type="radio" id="env-prod" name="environment" value="PROD" checked>
+                        <label for="env-prod"><i class="fa-solid fa-server"></i> Production</label>
+                        
+                        <input type="radio" id="env-uat" name="environment" value="UAT">
+                        <label for="env-uat"><i class="fa-solid fa-flask-vial"></i> UAT</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="tile_ids">2. Enter Tile IDs (one per line)</label>
+                    <textarea id="tile_ids" name="tile_ids" rows="10" placeholder="e.g.,&#10;1287422174&#10;1287422175&#10;1287247297" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="base_filename">3. Enter Base Filename</label>
+                    <input type="text" id="base_filename" name="base_filename" placeholder="e.g., stuttgart_tasks" required>
+                </div>
+
+                <button type="submit" id="submit-button">
+                    <span class="button-text"><i class="fa-solid fa-file-export"></i> Generate Files</span>
+                    <span class="spinner"></span>
+                </button>
+            </form>
+        </main>
+        
+        <footer class="card-footer">
+            <p><i class="fa-solid fa-download"></i> Files will be downloaded directly to your browser.</p>
+        </footer>
+    </div>
+
+    <script>
+        // This script is ONLY for showing a spinner on the main page form.
+        const form = document.getElementById('generator-form');
+        const submitButton = document.getElementById('submit-button');
+        const buttonText = submitButton.querySelector('.button-text');
+        const spinner = submitButton.querySelector('.spinner');
+
+        form.addEventListener('submit', function() {
+            submitButton.disabled = true;
+            buttonText.textContent = 'Generating...';
+            spinner.style.display = 'inline-block';
+        });
+    </script>
+</body>
+</html>

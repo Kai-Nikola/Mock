@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Downloading Files...</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <style>
+        .download-container { text-align: center; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .download-container h1 { color: var(--primary-color); margin-bottom: 15px; }
+        .download-container p { font-size: 1.1rem; margin-bottom: 25px; }
+        .spinner-large { width: 60px; height: 60px; border: 5px solid rgba(0, 123, 255, 0.2); border-top-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 30px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="card-body download-container">
+            <div class="spinner-large"></div>
+            <h1>Preparing Your Downloads</h1>
+            <p>Your files are being downloaded automatically.</p>
+            <p class="footer-note">Please check your browser for a prompt asking for permission to download multiple files and click <strong>"Allow"</strong>.</p>
+        </div>
+    </div>
+
+    <script>
+        // This script is ONLY for the download page.
+        // The |safe filter is crucial here to ensure the JSON is valid.
+        const filesToDownload = {{ files|tojson|safe }};
+
+        function downloadFile(filename, content) {
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+            element.setAttribute('download', filename);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+
+        function startDownloads() {
+            filesToDownload.forEach((file, index) => {
+                setTimeout(() => {
+                    downloadFile(file.filename, file.content);
+                }, index * 500);
+            });
+
+            const totalDelay = filesToDownload.length * 500 + 2000;
+            setTimeout(() => {
+                window.location.href = '/';
+            }, totalDelay);
+        }
+
+        window.onload = startDownloads;
+    </script>
+</body>
+</html>
